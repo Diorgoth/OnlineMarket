@@ -1,5 +1,3 @@
-package pdp_lessons.module2.extraTask.task11;
-
 public class ShoppingCart {
 
     private int shoppingCartId;

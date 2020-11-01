@@ -1,5 +1,3 @@
-package pdp_lessons.module2.extraTask.task11;
-
 public class Product {
 
     private String name;

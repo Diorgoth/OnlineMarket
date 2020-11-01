@@ -1,6 +1,3 @@
-package pdp_lessons.module2.extraTask.task11;
-
-import pdp_lessons.module2.extraTask.task8.Authorization;
 
 public class User implements Authorization {
 

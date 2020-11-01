@@ -1,7 +1,3 @@
-package pdp_lessons.module2.extraTask.task11;
-
-import pdp_lessons.module2.extraTask.task7.Order;
-
 import java.util.*;
 
 public class OnlineMarketDemo {
@@ -13,7 +9,7 @@ public class OnlineMarketDemo {
     static Set<User> users;
     static List<Category> categories;
     static HashMap<Integer, Product> products;
-    static List<Order> orders;
+    static List<Orders> orders;
     static List<OrderDetails> orderDetails;
     static List<ShoppingCart> shoppingCarts;
 
