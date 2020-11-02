@@ -6,7 +6,7 @@ public class OnlineMarketDemo {
     static String choiceString;
     static User activeUser = null;
 
-    static Set<User> users;
+    static List<User> users;
     static List<Category> categories;
     static HashMap<Integer, Product> products;
     static List<Orders> orders;
@@ -15,7 +15,7 @@ public class OnlineMarketDemo {
 
     public static void main(String[] args) {
 
-        users = new HashSet<>();
+        users = new ArrayList<>();
         users.add(new User("Khamza Kuranbayev", "khamza@mail.ru", "cust123", Role.CUSTOMER));
         users.add(new User("Aziz Ahmedov", "aziz@mail.ru", "sale123", Role.SALESMAN));
         users.add(new User("Savriddin Yuldashev", "savriddin@mail.ru", "man123", Role.MANAGER));
@@ -75,6 +75,19 @@ public class OnlineMarketDemo {
 
     private static void signUp() {
 
+        System.out.println("New Costumer");
+        // NAME
+        // ...
+        System.out.print("Name:");
+        String name1 = scanner.next();
+        System.out.print("Email:");
+        String email1 = scanner.next();
+        System.out.print("Password:");
+        String password1 = scanner.next();
+        users.add(new User(name1, email1, password1, Role.CUSTOMER));
+        System.out.println(" Successfully signed up!");
+        activeUser = users.get(users.size() - 1);
+
     }
 
     private static void login() {
@@ -87,6 +100,7 @@ public class OnlineMarketDemo {
                 if (user.login(email, password)) {
                     activeUser = user;
                     break;
+
                 }
             }
         }
@@ -94,9 +108,30 @@ public class OnlineMarketDemo {
 
     private static void implementDirector() {
 
+
     }
 
     private static void implementManager() {
+        System.out.println("1)Add Salesman.");
+        System.out.println("2)View transaction history.");
+        choiceInt = scanner.nextInt();
+        switch (choiceInt) {
+            case 1:
+                System.out.println("Name:");
+                String name1 = scanner.next();
+                System.out.println("Email:");
+                String email1 = scanner.next();
+                System.out.println("Password:");
+                String password1 = scanner.next();
+                users.add(new User(name1, email1, password1, Role.SALESMAN));
+                System.out.println("Salesman under name of " + name1 + " added to stuff list.");
+            case 2:
+                Iterator iterator = orderDetails.iterator();
+                while (iterator.hasNext()) {
+                    System.out.println(iterator.next());
+                }
+
+        }
 
     }
 
@@ -195,6 +230,8 @@ public class OnlineMarketDemo {
     }
 
     private static void implementCustomer() {
+
+
         // Zuhra
         // 1. sdlkj
         // 2. sdsd

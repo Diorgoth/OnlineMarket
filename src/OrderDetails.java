@@ -53,4 +53,15 @@ public class OrderDetails {
     public void setSubtotal(double subtotal) {
         this.subtotal = subtotal;
     }
+
+
+    @Override
+    public String toString() {
+        return "Details of order:" +
+                "order=" + order +
+                ", product=" + product +
+                ", quantity=" + quantity +
+                ", cost=" + cost +
+                ", subtotal=" + subtotal ;
+    }
 }
