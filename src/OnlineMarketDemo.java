@@ -5,13 +5,18 @@ public class OnlineMarketDemo {
     static int choiceInt;
     static String choiceString;
     static User activeUser = null;
+    static Category category = null;
 
     static List<User> users;
     static List<Category> categories;
     static HashMap<Integer, Product> products;
-    static List<Orders> orders;
+    static List<Order> orders;
     static List<OrderDetails> orderDetails;
     static List<ShoppingCart> shoppingCarts;
+    static LinkedHashMap<Product, Integer> tempMap = new LinkedHashMap<>();
+
+    static int totalPrice = 0;
+    static boolean hasOrder = false;
 
     public static void main(String[] args) {
 
@@ -27,9 +32,15 @@ public class OnlineMarketDemo {
         categories.add(new Category(3, "Clothes", "Baby Clothes"));
 
         products = new HashMap<>();
-        products.put(1, new Product("Redmi Note 8", categories.get(0), 1200, 50));
-        products.put(2, new Product("Nexia 3", categories.get(1), 6500, 200));
-        products.put(3, new Product("Jacket", categories.get(2), 650, 100));
+        products.put(1, new Product("Redmi Note 8", categories.get(0), 800, 50));
+        products.put(2, new Product("Samsung S8", categories.get(0), 900, 50));
+        products.put(3, new Product("Iphone 9", categories.get(0), 1000, 50));
+        products.put(4, new Product("Nexia 3", categories.get(1), 6500, 200));
+        products.put(5, new Product("Lacetti", categories.get(1), 7500, 200));
+        products.put(6, new Product("Spark", categories.get(1), 6000, 200));
+        products.put(7, new Product("Jacket", categories.get(2), 150, 100));
+        products.put(8, new Product("T-Shirt", categories.get(2), 250, 100));
+        products.put(9, new Product("Shoes", categories.get(2), 350, 100));
 
         orders = new ArrayList<>();
         orderDetails = new ArrayList<>();
@@ -100,7 +111,6 @@ public class OnlineMarketDemo {
                 if (user.login(email, password)) {
                     activeUser = user;
                     break;
-
                 }
             }
         }
@@ -112,8 +122,10 @@ public class OnlineMarketDemo {
     }
 
     private static void implementManager() {
-        System.out.println("1)Add Salesman.");
-        System.out.println("2)View transaction history.");
+        System.out.println("\n1. Add Salesman.");
+        System.out.println("2. View transaction history.");
+        System.out.println("0. Exit");
+
         choiceInt = scanner.nextInt();
         switch (choiceInt) {
             case 1:
@@ -125,11 +137,30 @@ public class OnlineMarketDemo {
                 String password1 = scanner.next();
                 users.add(new User(name1, email1, password1, Role.SALESMAN));
                 System.out.println("Salesman under name of " + name1 + " added to stuff list.");
+                break;
             case 2:
-                Iterator iterator = orderDetails.iterator();
-                while (iterator.hasNext()) {
-                    System.out.println(iterator.next());
+                System.out.println("\n-----------------Transaction history--------------------");
+                orders.forEach(order -> {
+                    if (order.isOrderStatus()) {
+                        System.out.println("Order Number: " + order.getOrderId()
+                                + " | " + order.getCustomer().getName()
+                                + " | " + order.getTotalPrice());
+                    }
+                });
+                System.out.println("--------------------------------------------------");
+                System.out.print("Order Number: ");
+                choiceInt = scanner.nextInt();
+                System.out.println("------------------- Products ----------------------");
+                for (OrderDetails orderDetail : orderDetails) {
+                    if (orderDetail.getOrder().getOrderId() == choiceInt) {
+                        System.out.println("Product: " + orderDetail.getProduct().getName()
+                                + "  |  Quantity: " + orderDetail.getQuantity()
+                                + "  |  Price: " + orderDetail.getProduct().getPrice()
+                                + "  |  Total Price: " + (orderDetail.getProduct().getPrice() * orderDetail.getQuantity()));
+                    }
                 }
+                System.out.println("--------------------------------------------------");
+                break;
 
         }
 
@@ -137,32 +168,66 @@ public class OnlineMarketDemo {
 
     private static void implementSalesman() {
 
-        System.out.println("\n\nWelcome to Salesman Form");
-        System.out.println("----------------------------");
-        System.out.println("1. Add Product");
-        System.out.println("2. Set Price");
-        System.out.println("0. Exit");
-        System.out.println("----------------------------");
-
-        choiceInt = scanner.nextInt();
-        switch (choiceInt) {
-            case 1:
-                addProduct();
-                break;
-            case 2:
-                setPrice();
-                break;
+        boolean b = true;
+        while (b) {
+            System.out.println("\n\n============ SALESMAN FORM ==============");
+            System.out.println("1. Add Product");
+            System.out.println("2. Set Price");
+            System.out.println("3. View All Products");
+            System.out.println("4. Remove Product");
+            System.out.println("0. Exit");
+            System.out.println("=========================================");
+            System.out.print("Choose: ");
+            choiceInt = scanner.nextInt();
+            switch (choiceInt) {
+                case 1:
+                    addProduct();
+                    break;
+                case 2:
+                    setPrice();
+                    break;
+                case 3:
+                    System.out.println("\n----------- ALL PRODUCTS ------------");
+                    getAllProducts();
+                    System.out.println("-------------------------------------");
+                    break;
+                case 4:
+                    removeProduct();
+                    break;
+                case 0:
+                    System.out.println("\n");
+                    b = false;
+                    break;
+            }
         }
-
     }
 
-    private static void setPrice() {
+    private static void removeProduct() {
         System.out.println("\nChoose Product");
         System.out.println("-----------------------------");
         getAllProducts();
         System.out.println("-----------------------------");
         choiceInt = scanner.nextInt();
+        String productName = products.get(choiceInt).getName();
+        System.out.println("Do you want to remove " + productName + " ? y - YES n - NO");
+        choiceString = scanner.next();
+        if (choiceString.equals("y")) {
+            products.remove(choiceInt);
+            System.out.println(productName + " is removed!");
+        }
+    }
+
+    private static void setPrice() {
+        System.out.println("\n----------- ALL PRODUCTS ------------");
+        getAllProducts();
+        System.out.println("-------------------------------------");
+        System.out.print("Choose: ");
+        choiceInt = scanner.nextInt();
         Product product = products.get(choiceInt);
+        System.out.println("Name: " + product.getName());
+        System.out.print("New Price: ");
+        product.setPrice(scanner.nextInt());
+        System.out.println("New price is set!");
     }
 
     private static void addProduct() {
@@ -230,13 +295,195 @@ public class OnlineMarketDemo {
     }
 
     private static void implementCustomer() {
-
-
         // Zuhra
         // 1. sdlkj
         // 2. sdsd
         // 3. sdsd
         // +  All
+
+        orders.add(new Order(orders.size() + 1, activeUser, false));
+        Order order = orders.get(orders.size() - 1);
+
+        boolean b = true;
+        while (b) {
+            System.out.println("\n\n============ CUSTOMER FORM ==============");
+            System.out.println("PlEASE CHOOSE CATEGORY:");
+            getAllCategories();
+            System.out.println(" + Choose All   - Cancel   V - View Shopping Cart   O - My Orders");
+            System.out.println("=========================================");
+            System.out.print("Choose: ");
+            choiceString = scanner.next();
+            switch (choiceString.toUpperCase()) {
+                case "-":
+                    System.out.println("\n\n");
+                    b = false;
+                    break;
+                case "V":
+
+                    if (hasOrder) {
+                        System.out.println("\n--------------------- Shopping Cart ---------------------");
+                        orders.forEach(order1 -> {
+                            if (order1.getCustomer().equals(activeUser) && !order1.isOrderStatus()) {
+                                orderDetails.forEach(orderDetails1 -> {
+                                    if (orderDetails1.getOrder().equals(order1)) {
+                                        totalPrice += (orderDetails1.getProduct().getPrice() * orderDetails1.getQuantity());
+                                        System.out.println("Product: " + orderDetails1.getProduct().getName()
+                                                + "  |  Quantity: " + orderDetails1.getQuantity()
+                                                + "  |  Price: " + orderDetails1.getProduct().getPrice()
+                                                + "  |  Total Price: " + (orderDetails1.getProduct().getPrice() * orderDetails1.getQuantity()));
+                                    }
+                                });
+                            }
+                        });
+                        System.out.println("\n\n----------------- Total Price:      " + totalPrice + "----------------");
+                        System.out.println(" + Buy  - Cancel  C - Clear Cart");
+                        choiceString = scanner.next();
+                        if (choiceString.equals("+")) {
+                            buy(order);
+                            orders.add(new Order(orders.size() + 1, activeUser, false));
+                            order = orders.get(orders.size() - 1);
+
+                        } else if (choiceString.toUpperCase().equals("C")) {
+                            clearShoppingCart(order);
+                        }
+                    } else {
+                        System.out.println("Shopping Cart is empty!");
+                    }
+                    break;
+                case "O":
+                    viewMyOrders();
+                    break;
+                default:
+                    boolean b1 = true;
+                    while (b1) {
+                        System.out.println("\nChoose Product");
+                        System.out.println("-----------------------------");
+                        if (choiceString.equals("+")) {
+                            getAllProducts();
+                        } else {
+                            category = categories.get(Integer.parseInt(choiceString.trim()) - 1);
+                            products.forEach((index, product) -> {
+                                if (product.getCategory().equals(category)) {
+                                    System.out.println(index + ". " + product.getName());
+                                }
+                            });
+                        }
+                        System.out.println("-----------------------------");
+                        System.out.print("Choose: ");
+                        choiceInt = scanner.nextInt();
+                        Product product = products.get(choiceInt);
+
+                        int amountProduct = 0;
+                        if (checkTempMap(product)) {
+                            amountProduct = tempMap.get(product);
+                        } else if (tempMap.size() == 0 || !checkTempMap(product)) {
+                            tempMap.put(product, product.getAmount());
+                            amountProduct = tempMap.get(product);
+                        }
+
+                        System.out.println("Amount: " + amountProduct);
+
+                        System.out.println("\n" + product.toString());
+                        System.out.println(" + Add To Cart   - Cancel");
+                        scanner = new Scanner(System.in);
+                        String choiceString2 = scanner.next();
+                        if (choiceString2.equals("+")) {
+                            boolean b2 = true;
+                            while (b2) {
+                                System.out.print("Quantity: ");
+                                int quantity = scanner.nextInt();
+                                if (quantity <= amountProduct) {
+                                    addToCart(product, order, quantity);
+                                    tempMap.put(product, tempMap.get(product) - quantity);
+                                    b1 = false;
+                                    b2 = false;
+                                } else {
+                                    System.out.println("Not enough! Please retype.");
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
+
+        }
+
+    }
+
+    private static void addToCart(Product product, Order order, int quantity) {
+        if (checkShoppingCart(product, order)) {
+            OrderDetails orderDetails1 = orderDetails.get(indexProductInCart);
+            orderDetails1.setQuantity(orderDetails1.getQuantity() + quantity);
+        } else {
+            orderDetails.add(new OrderDetails(order, product, quantity));
+        }
+        System.out.println(product.getName() + " added to cart! OrderID: " + order.getOrderId());
+        hasOrder = true;
+    }
+
+    static int indexProductInCart = 0;
+
+    private static boolean checkShoppingCart(Product product, Order order) {
+
+        for (int i = 0; i < orderDetails.size(); i++) {
+            if (orderDetails.get(i).getOrder().equals(order) && orderDetails.get(i).getProduct().equals(product)) {
+                indexProductInCart = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void viewMyOrders() {
+        System.out.println("---------- My Orders -------------");
+        orders.forEach(order -> {
+            if (order.getCustomer().equals(activeUser) && order.isOrderStatus()) {
+                System.out.println("Order Number: " + order.getOrderId() + "  |  Total Price: " + order.getTotalPrice());
+            }
+        });
+        System.out.println("-----------------------------");
+        System.out.print("Order Number: ");
+        choiceInt = scanner.nextInt();
+        for (OrderDetails orderDetail : orderDetails) {
+            if (orderDetail.getOrder().getOrderId() == choiceInt) {
+                System.out.println("Product: " + orderDetail.getProduct().getName()
+                        + "  |  Quantity: " + orderDetail.getQuantity()
+                        + "  |  Price: " + orderDetail.getProduct().getPrice()
+                        + "  |  Total Price: " + (orderDetail.getProduct().getPrice() * orderDetail.getQuantity()));
+            }
+        }
+    }
+
+    private static boolean checkTempMap(Product product) {
+
+        for (Map.Entry<Product, Integer> entry : tempMap.entrySet()) {
+            if (entry.getKey().equals(product)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void clearShoppingCart(Order order) {
+        orders.remove(order);
+        System.out.print("Shopping cart is cleared!\n");
+        tempMap.clear();
+    }
+
+    private static void buy(Order order) {
+        orders.forEach(order1 -> {
+            if (order1.getOrderId() == order.getOrderId()) {
+                if (order1.getCustomer().equals(activeUser) && !order1.isOrderStatus()) {
+                    order1.setOrderStatus(true);
+                    order1.setTotalPrice(totalPrice);
+                    System.out.println("The sale was successful! Your Order Number is " + order1.getOrderId() + "\n");
+                    hasOrder = false;
+                    totalPrice = 0;
+                }
+            }
+        });
+        tempMap.forEach(Product::setAmount);
+        tempMap.clear();
     }
 
     private static void printMainMenu() {
